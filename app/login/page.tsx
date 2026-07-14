@@ -1,6 +1,34 @@
+"use client";
+
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setMessage("Invalid email or password");
+      return;
+    }
+
+    router.push("/dashboard");
+  }
+
   return (
     <main className="section">
 
@@ -20,46 +48,33 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="comparison-card" style={{ maxWidth: "700px", margin: "0 auto" }}>
+        <div
+          className="comparison-card"
+          style={{ maxWidth: "700px", margin: "0 auto" }}
+        >
 
           <h3>Login To Your Account</h3>
 
-          <form className="contact-form">
-
-            <select>
-              <option>Patient</option>
-              <option>Doctor</option>
-              <option>Laboratory</option>
-              <option>Administrator</option>
-            </select>
+          <form
+            className="contact-form"
+            onSubmit={handleLogin}
+          >
 
             <input
               type="email"
               placeholder="Email Address"
+              value={email}
+              onChange={(e)=>setEmail(e.target.value)}
+              required
             />
 
             <input
               type="password"
               placeholder="Password"
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
+              required
             />
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "10px"
-              }}
-            >
-              <label>
-                <input type="checkbox" /> Remember Me
-              </label>
-
-              <Link href="/contact">
-                Forgot Password?
-              </Link>
-            </div>
 
             <button
               type="submit"
@@ -69,6 +84,8 @@ export default function LoginPage() {
             </button>
 
           </form>
+
+          <p>{message}</p>
 
           <br />
 
@@ -80,74 +97,6 @@ export default function LoginPage() {
           </p>
 
         </div>
-
-        <section className="section">
-
-          <div className="section-header">
-            <h2>Quick Portal Access</h2>
-          </div>
-
-          <div className="auth-grid">
-
-            <div className="auth-card">
-              <h3>Patient Portal</h3>
-
-              <p>
-                Access reports, results and screening history.
-              </p>
-
-              <Link href="/dashboard/patient">
-                <button className="primary-btn">
-                  Patient Dashboard
-                </button>
-              </Link>
-            </div>
-
-            <div className="auth-card">
-              <h3>Doctor Portal</h3>
-
-              <p>
-                Review patient results and clinical reports.
-              </p>
-
-              <Link href="/dashboard/doctor">
-                <button className="primary-btn">
-                  Doctor Dashboard
-                </button>
-              </Link>
-            </div>
-
-            <div className="auth-card">
-              <h3>Laboratory Portal</h3>
-
-              <p>
-                Manage samples and laboratory workflows.
-              </p>
-
-              <Link href="/dashboard/lab">
-                <button className="primary-btn">
-                  Laboratory Dashboard
-                </button>
-              </Link>
-            </div>
-
-            <div className="auth-card">
-              <h3>Administrator</h3>
-
-              <p>
-                Manage platform operations and users.
-              </p>
-
-              <Link href="/dashboard/admin">
-                <button className="primary-btn">
-                  Admin Dashboard
-                </button>
-              </Link>
-            </div>
-
-          </div>
-
-        </section>
 
       </div>
 

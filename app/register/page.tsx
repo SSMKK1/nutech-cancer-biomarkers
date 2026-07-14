@@ -1,6 +1,56 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+
+  const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("PATIENT");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    const response = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        role,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.message);
+      return;
+    }
+
+    setMessage("Account created successfully. Redirecting...");
+
+    setTimeout(() => {
+      router.push("/login");
+    }, 1500);
+  }
+
+
   return (
     <main className="section">
 
@@ -21,62 +71,84 @@ export default function RegisterPage() {
 
         </div>
 
+
         <div
           className="comparison-card"
           style={{
-            maxWidth: "800px",
-            margin: "0 auto"
+            maxWidth:"800px",
+            margin:"0 auto"
           }}
         >
 
           <h3>Account Registration</h3>
 
-          <form className="contact-form">
 
-            <div className="form-grid">
+          <form
+            className="contact-form"
+            onSubmit={handleRegister}
+          >
 
-              <input
-                type="text"
-                placeholder="Full Name"
-              />
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e)=>setName(e.target.value)}
+              required
+            />
 
-              <input
-                type="email"
-                placeholder="Email Address"
-              />
 
-              <input
-                type="tel"
-                placeholder="Phone Number"
-              />
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e)=>setEmail(e.target.value)}
+              required
+            />
 
-              <input
-                type="text"
-                placeholder="Organization (Optional)"
-              />
 
-            </div>
+            <select
+              value={role}
+              onChange={(e)=>setRole(e.target.value)}
+            >
 
-            <select>
-              <option>Patient</option>
-              <option>Doctor</option>
-              <option>Laboratory</option>
+              <option value="PATIENT">
+                Patient
+              </option>
+
+              <option value="DOCTOR">
+                Doctor
+              </option>
+
+              <option value="LAB">
+                Laboratory
+              </option>
+
             </select>
+
 
             <input
               type="password"
               placeholder="Create Password"
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
+              required
             />
+
 
             <input
               type="password"
               placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e)=>setConfirmPassword(e.target.value)}
+              required
             />
 
+
             <label>
-              <input type="checkbox" /> I agree to the Terms
-              of Service and Privacy Policy
+              <input type="checkbox" required />
+              I agree to the Terms of Service and Privacy Policy
             </label>
+
 
             <button
               type="submit"
@@ -85,9 +157,15 @@ export default function RegisterPage() {
               Create Account
             </button>
 
+
           </form>
 
+
+          <p>{message}</p>
+
+
           <br />
+
 
           <p>
             Already have an account?{" "}
@@ -96,52 +174,9 @@ export default function RegisterPage() {
             </Link>
           </p>
 
+
         </div>
 
-        <section className="section">
-
-          <div className="section-header">
-            <h2>Account Types</h2>
-          </div>
-
-          <div className="timeline-grid">
-
-            <div className="auth-card">
-
-              <h3>Patient</h3>
-
-              <p>
-                Access results, reports, screening history
-                and health information.
-              </p>
-
-            </div>
-
-            <div className="auth-card">
-
-              <h3>Doctor</h3>
-
-              <p>
-                Review patient reports, monitor risk scores
-                and manage clinical workflows.
-              </p>
-
-            </div>
-
-            <div className="auth-card">
-
-              <h3>Laboratory</h3>
-
-              <p>
-                Process samples, manage testing workflows
-                and submit laboratory results.
-              </p>
-
-            </div>
-
-          </div>
-
-        </section>
 
       </div>
 
