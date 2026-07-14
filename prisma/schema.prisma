@@ -1,11 +1,11 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
 
 enum Role {
   ADMIN
@@ -14,6 +14,7 @@ enum Role {
   PATIENT
 }
 
+
 enum SampleStatus {
   REGISTERED
   COLLECTED
@@ -21,22 +22,30 @@ enum SampleStatus {
   COMPLETED
 }
 
+
 model User {
+
   id       String @id @default(cuid())
   name     String
   email    String @unique
   password String
   role     Role   @default(PATIENT)
 
+
   doctorProfile  DoctorProfile?
   labProfile     LaboratoryProfile?
   patientProfile PatientProfile?
 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }
 
+
+
 model DoctorProfile {
+
   id             String  @id @default(cuid())
   userId         String  @unique
   hospital       String?
@@ -44,14 +53,21 @@ model DoctorProfile {
   licenseNumber  String?
   approved       Boolean @default(false)
 
+
   user User @relation(fields: [userId], references: [id])
+
 
   samples Sample[]
 
+
   createdAt DateTime @default(now())
+
 }
 
+
+
 model LaboratoryProfile {
+
   id       String  @id @default(cuid())
   userId   String  @unique
   name     String
@@ -59,89 +75,149 @@ model LaboratoryProfile {
   contact  String?
   approved Boolean @default(false)
 
+
   user User @relation(fields: [userId], references: [id])
+
 
   samples Sample[]
 
+
   createdAt DateTime @default(now())
+
 }
 
+
+
+
 model PatientProfile {
+
   id          String    @id @default(cuid())
   userId      String    @unique
   dateOfBirth DateTime?
   gender      String?
   phone       String?
 
+
   user User @relation(fields: [userId], references: [id])
+
 
   samples Sample[]
 
+
   createdAt DateTime @default(now())
+
 }
 
+
+
+
+
 model Sample {
+
   id         String @id @default(cuid())
   sampleCode String @unique
+
 
   patientId String
   doctorId  String?
   labId     String?
 
+
   status SampleStatus @default(REGISTERED)
+
+
 
   patient PatientProfile     @relation(fields: [patientId], references: [id])
   doctor  DoctorProfile?     @relation(fields: [doctorId], references: [id])
   lab     LaboratoryProfile? @relation(fields: [labId], references: [id])
 
+
   result Result?
 
+
+
   collectedAt DateTime?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
+
 }
 
+
+
+
+
 model Result {
+
   id String @id @default(cuid())
 
+
   sampleId String @unique
+
 
   biomarkerName  String
   value          String
   interpretation String?
 
+
+
   sample Sample @relation(fields: [sampleId], references: [id])
 
+
   createdAt DateTime @default(now())
+
 }
 
+
+
+
+
 model ContactInquiry {
+
   id String @id @default(cuid())
+
 
   name    String
   email   String
   message String
 
+
   createdAt DateTime @default(now())
+
 }
 
+
+
+
+
 model PartnerApplication {
+
   id String @id @default(cuid())
+
 
   organization String
   contactName  String
   email        String
   message      String
 
+
   createdAt DateTime @default(now())
+
 }
 
+
+
+
+
 model InvestorInquiry {
+
   id String @id @default(cuid())
+
 
   name    String
   company String?
   email   String
   message String
 
+
   createdAt DateTime @default(now())
+
 }

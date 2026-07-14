@@ -1,41 +1,168 @@
-export default function PatientTable() {
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+
+export default async function PatientTable(){
+
+
+  const session = await auth();
+
+
+
+  const doctor = await prisma.user.findUnique({
+
+    where:{
+      email: session?.user?.email || "",
+    },
+
+
+    include:{
+
+      doctorProfile:{
+
+        include:{
+
+          samples:{
+
+            include:{
+
+              patient:{
+                include:{
+                  user:true
+                }
+              },
+
+              result:true
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  });
+
+
+
+  const samples =
+    doctor?.doctorProfile?.samples || [];
+
+
+
+  if(samples.length === 0){
+
+    return (
+
+      <div className="comparison-card">
+
+        <p>
+          No patient records available.
+        </p>
+
+      </div>
+
+    );
+
+  }
+
+
+
   return (
+
     <table className="dashboard-table">
 
+
       <thead>
+
         <tr>
-          <th>Patient ID</th>
-          <th>Name</th>
-          <th>Risk Index</th>
-          <th>Status</th>
+
+          <th>
+            Patient ID
+          </th>
+
+
+          <th>
+            Name
+          </th>
+
+
+          <th>
+            Sample Code
+          </th>
+
+
+          <th>
+            Status
+          </th>
+
+
+          <th>
+            Result
+          </th>
+
         </tr>
+
       </thead>
+
+
 
       <tbody>
 
-        <tr>
-          <td>PT-1001</td>
-          <td>John Smith</td>
-          <td>0.18</td>
-          <td>Low Risk</td>
-        </tr>
 
-        <tr>
-          <td>PT-1002</td>
-          <td>Michael Brown</td>
-          <td>0.42</td>
-          <td>Moderate Risk</td>
-        </tr>
+        {samples.map(sample=>(
 
-        <tr>
-          <td>PT-1003</td>
-          <td>David Wilson</td>
-          <td>0.76</td>
-          <td>High Risk</td>
-        </tr>
+
+          <tr key={sample.id}>
+
+
+            <td>
+              {sample.patient.id}
+            </td>
+
+
+            <td>
+              {sample.patient.user.name}
+            </td>
+
+
+            <td>
+              {sample.sampleCode}
+            </td>
+
+
+            <td>
+              {sample.status}
+            </td>
+
+
+            <td>
+
+              {
+                sample.result
+                ?
+                sample.result.value
+                :
+                "Pending"
+              }
+
+            </td>
+
+
+          </tr>
+
+
+        ))}
+
 
       </tbody>
 
+
     </table>
+
   );
+
 }

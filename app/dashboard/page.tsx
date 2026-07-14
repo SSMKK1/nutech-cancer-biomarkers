@@ -1,111 +1,51 @@
-import Link from "next/link";
-
-export default function DashboardPage() {
-
-  return (
-
-    <main className="section">
-
-      <div className="container">
-
-        <div className="section-header">
-
-          <span className="eyebrow">
-            SEROMARK-1 SECURE PLATFORM
-          </span>
-
-          <h1>
-            Welcome to Your Dashboard
-          </h1>
-
-          <p>
-            Access your SeroMark-1 services and account features.
-          </p>
-
-        </div>
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 
-        <div className="auth-grid">
+export default async function DashboardPage(){
+
+  const session = await auth();
 
 
-          <div className="auth-card">
+  if(!session?.user?.role){
 
-            <h3>
-              Patient Portal
-            </h3>
+    redirect("/login");
 
-            <p>
-              View screening reports, results and health records.
-            </p>
-
-            <Link href="/dashboard/patient">
-              Open Portal
-            </Link>
-
-          </div>
+  }
 
 
 
-          <div className="auth-card">
+  switch(session.user.role){
 
-            <h3>
-              Doctor Portal
-            </h3>
 
-            <p>
-              Review patient information and clinical reports.
-            </p>
+    case "PATIENT":
 
-            <Link href="/dashboard/doctor">
-              Open Portal
-            </Link>
-
-          </div>
+      redirect("/dashboard/patient");
 
 
 
-          <div className="auth-card">
+    case "DOCTOR":
 
-            <h3>
-              Laboratory Portal
-            </h3>
-
-            <p>
-              Manage samples and laboratory workflows.
-            </p>
-
-            <Link href="/dashboard/lab">
-              Open Portal
-            </Link>
-
-          </div>
+      redirect("/dashboard/doctor");
 
 
 
-          <div className="auth-card">
+    case "LAB":
 
-            <h3>
-              Administrator
-            </h3>
-
-            <p>
-              Manage users and platform operations.
-            </p>
-
-            <Link href="/dashboard/admin">
-              Open Portal
-            </Link>
-
-          </div>
+      redirect("/dashboard/lab");
 
 
-        </div>
+
+    case "ADMIN":
+
+      redirect("/dashboard/admin");
 
 
-      </div>
 
-    </main>
+    default:
 
-  );
+      redirect("/login");
+
+  }
 
 }

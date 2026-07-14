@@ -1,7 +1,22 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import LogoutButton from "@/components/dashboard/LogoutButton";
 
-export default function Topbar() {
+export default async function Topbar() {
+
+  const session = await auth();
+
+  const userName =
+    session?.user?.name || "User";
+
+  const userRole =
+    session?.user?.role || "Account";
+
+  const avatarLetter =
+    userName.charAt(0).toUpperCase();
+
   return (
+
     <div className="dashboard-topbar">
 
       <div>
@@ -47,15 +62,24 @@ export default function Topbar() {
           </button>
         </Link>
 
+        <LogoutButton />
+
         <div className="dashboard-user">
 
           <div className="user-avatar">
-            N
+            {avatarLetter}
           </div>
 
           <div>
-            <strong>Demo User</strong>
-            <p>Secure Session Active</p>
+
+            <strong>
+              {userName}
+            </strong>
+
+            <p>
+              {userRole} Account
+            </p>
+
           </div>
 
         </div>
@@ -63,5 +87,7 @@ export default function Topbar() {
       </div>
 
     </div>
+
   );
+
 }
