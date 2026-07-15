@@ -1,37 +1,102 @@
-{role === "DOCTOR" && (
-  <>
-    <h4>Doctor Portal</h4>
+import Sidebar from "@/components/dashboard/Sidebar";
+import Topbar from "@/components/dashboard/Topbar";
+import PatientTable from "@/components/dashboard/PatientTable";
 
-    <Link href="/dashboard/doctor">
-      Dashboard Overview
-    </Link>
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-    <Link href="/dashboard/doctor/patients">
-      Patients
-    </Link>
+export default async function DoctorDashboard() {
+  const session = await auth();
 
-    <Link href="/dashboard/doctor/reports">
-      Clinical Reports
-    </Link>
+  const doctor = await prisma.user.findUnique({
+    where: {
+      email: session?.user?.email || "",
+    },
+    include: {
+      doctorProfile: {
+        include: {
+          samples: {
+            include: {
+              patient: {
+                include: {
+                  user: true,
+                },
+              },
+              result: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-    <Link href="/dashboard/doctor/risk-assessments">
-      Risk Assessments
-    </Link>
+  const samples: any[] = doctor?.doctorProfile?.samples || [];
 
-    <Link href="/dashboard/doctor/sample-tracking">
-      Sample Tracking
-    </Link>
+  const totalPatients = new Set(
+    samples.map((sample: any) => sample.patientId)
+  ).size;
 
-    <Link href="/dashboard/doctor/referrals">
-      Referrals
-    </Link>
+  const pendingReviews = samples.filter(
+    (sample: any) => sample.status !== "COMPLETED"
+  ).length;
 
-    <Link href="/dashboard/doctor/profile">
-      Profile
-    </Link>
+  const reportsSigned = samples.filter(
+    (sample: any) => sample.result !== null
+  ).length;
 
-    <Link href="/dashboard/doctor/settings">
-      Settings
-    </Link>
-  </>
-)}
+  const activeOrders = samples.length;
+
+  return (
+    <div className="dashboard-layout">
+      <Sidebar />
+
+      <div className="dashboard-main">
+        <Topbar />
+
+        <main className="section">
+          <div className="container">
+            <div className="section-header">
+              <span className="eyebrow">DOCTOR PORTAL</span>
+
+              <h1>Doctor Dashboard</h1>
+
+              <p>
+                Manage patient screening and biomarker reports.
+              </p>
+            </div>
+
+            <div className="metrics-grid">
+              <div className="metric-card">
+                <h3>Total Patients</h3>
+                <span>{totalPatients}</span>
+              </div>
+
+              <div className="metric-card">
+                <h3>Pending Reviews</h3>
+                <span>{pendingReviews}</span>
+              </div>
+
+              <div className="metric-card">
+                <h3>Reports Signed</h3>
+                <span>{reportsSigned}</span>
+              </div>
+
+              <div className="metric-card">
+                <h3>Active Orders</h3>
+                <span>{activeOrders}</span>
+              </div>
+            </div>
+
+            <section className="section">
+              <div className="section-header">
+                <h2>Patient Screening Queue</h2>
+              </div>
+
+              <PatientTable />
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
