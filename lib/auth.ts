@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
 
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
 
   providers: [
@@ -27,9 +26,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       },
 
-
       async authorize(credentials) {
-
 
         if (
           !credentials?.email ||
@@ -37,7 +34,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ) {
           return null;
         }
-
 
         const user = await prisma.user.findUnique({
 
@@ -47,41 +43,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         });
 
-
         if (!user) {
           return null;
         }
 
-
         const passwordMatch = await bcrypt.compare(
-
           credentials.password as string,
-
           user.password
-
         );
 
-
         if (!passwordMatch) {
-
           return null;
-
         }
 
-
-
         return {
-
           id: user.id,
-
           name: user.name,
-
           email: user.email,
-
           role: user.role,
-
         };
-
 
       },
 
@@ -89,62 +69,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   ],
 
-
-
   pages: {
-
     signIn: "/login",
-
   },
-
-
 
   session: {
-
     strategy: "jwt",
-
   },
-
-
 
   callbacks: {
 
-
     async jwt({ token, user }) {
 
-
-      if(user){
-
-        token.role = user.role;
-
+      if (user) {
+        token.role = (user as any).role;
       }
-
 
       return token;
 
     },
 
-
-
     async session({ session, token }) {
 
-
-      if(session.user){
-
-        session.user.role = token.role as string;
-
+      if (session.user) {
+        (session.user as any).role = token.role;
       }
-
 
       return session;
 
     },
 
-
   },
 
-
   secret: process.env.AUTH_SECRET,
-
 
 });
