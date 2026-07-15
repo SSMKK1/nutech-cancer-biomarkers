@@ -6,37 +6,33 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 
-export default async function DoctorDashboard(){
-
+export default async function DoctorDashboard() {
 
   const session = await auth();
 
-
-
   const doctor = await prisma.user.findUnique({
 
-    where:{
-      email:session?.user?.email || "",
+    where: {
+      email: session?.user?.email || "",
     },
 
+    include: {
 
-    include:{
+      doctorProfile: {
 
-      doctorProfile:{
+        include: {
 
-        include:{
+          samples: {
 
-          samples:{
+            include: {
 
-            include:{
-
-              patient:{
-                include:{
-                  user:true
+              patient: {
+                include: {
+                  user: true
                 }
               },
 
-              result:true
+              result: true
 
             }
 
@@ -52,9 +48,7 @@ export default async function DoctorDashboard(){
 
 
 
-
-
-  const samples =
+  const samples: any[] =
     doctor?.doctorProfile?.samples || [];
 
 
@@ -62,7 +56,7 @@ export default async function DoctorDashboard(){
   const totalPatients =
     new Set(
       samples.map(
-        sample=>sample.patientId
+        (sample: any) => sample.patientId
       )
     ).size;
 
@@ -70,16 +64,16 @@ export default async function DoctorDashboard(){
 
   const pendingReviews =
     samples.filter(
-      sample =>
-      sample.status !== "COMPLETED"
+      (sample: any) =>
+        sample.status !== "COMPLETED"
     ).length;
 
 
 
   const reportsSigned =
     samples.filter(
-      sample =>
-      sample.result !== null
+      (sample: any) =>
+        sample.result !== null
     ).length;
 
 
@@ -93,49 +87,35 @@ export default async function DoctorDashboard(){
 
     <div className="dashboard-layout">
 
-
       <Sidebar />
-
 
       <div className="dashboard-main">
 
-
         <Topbar />
-
-
 
         <main className="section">
 
-
           <div className="container">
 
-
             <div className="section-header">
-
 
               <span className="eyebrow">
                 DOCTOR PORTAL
               </span>
 
-
               <h1>
                 Doctor Dashboard
               </h1>
-
 
               <p>
                 Manage patient screening and biomarker reports.
               </p>
 
-
             </div>
 
 
 
-
-
             <div className="metrics-grid">
-
 
               <div className="metric-card">
 
@@ -165,7 +145,6 @@ export default async function DoctorDashboard(){
 
 
 
-
               <div className="metric-card">
 
                 <h3>
@@ -177,7 +156,6 @@ export default async function DoctorDashboard(){
                 </span>
 
               </div>
-
 
 
 
@@ -193,16 +171,11 @@ export default async function DoctorDashboard(){
 
               </div>
 
-
-
             </div>
 
 
 
-
-
             <section className="section">
-
 
               <div className="section-header">
 
@@ -212,29 +185,19 @@ export default async function DoctorDashboard(){
 
               </div>
 
-
-
-
               <PatientTable />
-
-
 
             </section>
 
 
 
-
-
             <section className="section">
 
-
               <div className="comparison-card">
-
 
                 <h3>
                   Recent Clinical Activity
                 </h3>
-
 
                 <ul>
 
@@ -252,28 +215,18 @@ export default async function DoctorDashboard(){
 
                 </ul>
 
-
               </div>
-
 
             </section>
 
-
-
-
           </div>
-
 
         </main>
 
-
       </div>
-
 
     </div>
 
-
   );
-
 
 }

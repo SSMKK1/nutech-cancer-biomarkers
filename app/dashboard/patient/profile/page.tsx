@@ -6,6 +6,8 @@ export default async function PatientProfilePage() {
 
   const session = await auth();
 
+  const role = (session?.user as any)?.role;
+
   return (
 
     <div className="dashboard-layout">
@@ -49,7 +51,7 @@ export default async function PatientProfilePage() {
               </p>
 
               <p>
-                <strong>Role:</strong> {session?.user?.role}
+                <strong>Role:</strong> {role}
               </p>
 
             </div>

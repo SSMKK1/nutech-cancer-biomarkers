@@ -6,6 +6,8 @@ export default async function PatientSettingsPage() {
 
   const session = await auth();
 
+  const role = (session?.user as any)?.role;
+
   return (
 
     <div className="dashboard-layout">
@@ -111,7 +113,7 @@ export default async function PatientSettingsPage() {
                 <ul>
                   <li>Name: {session?.user?.name}</li>
                   <li>Email: {session?.user?.email}</li>
-                  <li>Role: {session?.user?.role}</li>
+                  <li>Role: {role}</li>
                   <li>Status: Active</li>
                 </ul>
 

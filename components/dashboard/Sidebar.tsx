@@ -5,13 +5,11 @@ export default async function Sidebar() {
 
   const session = await auth();
 
-  const role = session?.user?.role;
-
+  const role = (session?.user as any)?.role;
 
   return (
 
     <aside className="dashboard-sidebar">
-
 
       <div className="dashboard-brand">
 
@@ -21,14 +19,10 @@ export default async function Sidebar() {
 
       </div>
 
-
-
       <nav className="dashboard-nav">
-
 
         {role === "PATIENT" && (
           <>
-
             <h4>Patient Portal</h4>
 
             <Link href="/dashboard/patient">
@@ -50,15 +44,11 @@ export default async function Sidebar() {
             <Link href="/dashboard/profile">
               Settings
             </Link>
-
           </>
         )}
 
-
-
         {role === "DOCTOR" && (
           <>
-
             <h4>Doctor Portal</h4>
 
             <Link href="/dashboard/doctor">
@@ -84,15 +74,11 @@ export default async function Sidebar() {
             <Link href="/dashboard/profile">
               Settings
             </Link>
-
           </>
         )}
 
-
-
         {role === "LAB" && (
           <>
-
             <h4>Laboratory Portal</h4>
 
             <Link href="/dashboard/lab">
@@ -118,15 +104,11 @@ export default async function Sidebar() {
             <Link href="/dashboard/profile">
               Settings
             </Link>
-
           </>
         )}
 
-
-
         {role === "ADMIN" && (
           <>
-
             <h4>Administration</h4>
 
             <Link href="/dashboard/admin">
@@ -168,11 +150,8 @@ export default async function Sidebar() {
             <Link href="/dashboard/profile">
               Settings
             </Link>
-
           </>
         )}
-
-
 
         <hr />
 
@@ -180,14 +159,11 @@ export default async function Sidebar() {
           Return To Website
         </Link>
 
-
         <Link href="/contact">
           Contact Support
         </Link>
 
-
       </nav>
-
 
     </aside>
 
