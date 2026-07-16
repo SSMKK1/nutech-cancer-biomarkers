@@ -5,119 +5,87 @@ import RequestScreeningButton from "@/components/dashboard/RequestScreeningButto
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-
-export default async function PatientDashboard(){
-
+export default async function PatientDashboard() {
 
   const session = await auth();
 
-
-
   const patient = await prisma.user.findUnique({
 
-    where:{
+    where: {
       email: session?.user?.email || "",
     },
 
+    include: {
 
-    include:{
+      patientProfile: {
 
-      patientProfile:{
+        include: {
 
-        include:{
+          samples: {
 
-          samples:{
+            include: {
 
-            include:{
+              result: true,
 
-              result:true
+            },
 
-            }
+          },
 
-          }
+        },
 
-        }
+      },
 
-      }
-
-    }
-
+    },
 
   });
 
-
-
-
-  const samples =
+  const samples: any[] =
     patient?.patientProfile?.samples || [];
-
-
 
   const completedTests =
     samples.filter(
-      sample => sample.status === "COMPLETED"
+      (sample: any) => sample.status === "COMPLETED"
     ).length;
-
-
 
   const latestResult =
     samples
-    .filter(
-      sample => sample.result
-    )
-    .at(-1)
-    ?.result;
-
-
+      .filter(
+        (sample: any) => sample.result
+      )
+      .at(-1)
+      ?.result;
 
   return (
 
     <div className="dashboard-layout">
 
-
       <Sidebar />
-
 
       <div className="dashboard-main">
 
-
         <Topbar />
-
-
 
         <main className="section">
 
-
           <div className="container">
 
-
-
             <div className="section-header">
-
 
               <span className="eyebrow">
                 PATIENT PORTAL
               </span>
 
-
               <h1>
                 Patient Dashboard
               </h1>
-
 
               <p>
                 Monitor your SeroMark-1 screening journey.
               </p>
 
-
             </div>
 
-
-
-
-
             <div className="metrics-grid">
-
 
               <div className="metric-card">
 
@@ -131,9 +99,6 @@ export default async function PatientDashboard(){
 
               </div>
 
-
-
-
               <div className="metric-card">
 
                 <h3>
@@ -145,9 +110,6 @@ export default async function PatientDashboard(){
                 </span>
 
               </div>
-
-
-
 
               <div className="metric-card">
 
@@ -161,9 +123,6 @@ export default async function PatientDashboard(){
 
               </div>
 
-
-
-
               <div className="metric-card">
 
                 <h3>
@@ -176,63 +135,37 @@ export default async function PatientDashboard(){
 
               </div>
 
-
             </div>
-
-
-
-
-
 
             <section className="section">
 
-
               <div className="comparison-card">
-
 
                 <h3>
                   New Screening Request
                 </h3>
 
-
                 <p>
                   Start your SeroMark-1 biomarker screening process.
                 </p>
 
-
                 <RequestScreeningButton />
-
 
               </div>
 
-
             </section>
-
-
-
-
-
 
             <section className="section">
 
-
               <div className="section-header">
-
 
                 <h2>
                   Screening History
                 </h2>
 
-
               </div>
 
-
-
-
-
               <div className="comparison-card">
-
-
 
                 {samples.length === 0 && (
 
@@ -242,27 +175,17 @@ export default async function PatientDashboard(){
 
                 )}
 
-
-
-
-
-                {samples.map(sample => (
-
+                {samples.map((sample: any) => (
 
                   <div key={sample.id}>
-
 
                     <h3>
                       {sample.sampleCode}
                     </h3>
 
-
                     <p>
                       Status: {sample.status}
                     </p>
-
-
-
 
                     {sample.result && (
 
@@ -272,36 +195,24 @@ export default async function PatientDashboard(){
 
                     )}
 
-
-
                     <hr />
-
 
                   </div>
 
-
                 ))}
-
 
               </div>
 
-
             </section>
-
-
 
           </div>
 
-
         </main>
 
-
       </div>
-
 
     </div>
 
   );
-
 
 }
