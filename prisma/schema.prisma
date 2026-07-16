@@ -27,6 +27,15 @@ model User {
   password String
   role     Role   @default(PATIENT)
 
+  image String?
+
+  emailNotifications     Boolean @default(true)
+  screeningNotifications Boolean @default(true)
+  marketingNotifications Boolean @default(false)
+
+  lastLoginAt       DateTime?
+  passwordChangedAt DateTime?
+
   doctorProfile  DoctorProfile?
   labProfile     LaboratoryProfile?
   patientProfile PatientProfile?
